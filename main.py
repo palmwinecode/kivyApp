@@ -3,6 +3,7 @@ from kivy.uix.gridlayout import GridLayout # type: ignore
 from kivy.uix.label import Label # type: ignore
 from kivy.uix.textinput import TextInput # type: ignore
 from kivy.uix.button import Button # type: ignore
+from kivy.uix.popup import Popup # type: ignore
 
 class ChildApp(GridLayout):
 
@@ -41,20 +42,38 @@ class ChildApp(GridLayout):
         # Add inner grid to main grid
         self.add_widget(self.inner_grid)
 
-        # Print button
-        self.print_btn = Button(text="Submit")
-        self.print_btn.bind(on_press = self.print_details)
-        self.add_widget(self.print_btn)
+        # Submit button
+        self.submit_btn = Button(text="Submit")
+        self.submit_btn.bind(on_press = self.on_submit)
+        self.add_widget(self.submit_btn)
 
-    # Function to print details
-    def print_details(self, instance):
-        # Print details
-        print(f"Name of student is {self.student_name.text}")
-        print(f"Score of student is {self.student_score.text}")
-        print(f"Gender of student is {self.student_gender.text}")
+    # Function to popup details
+    def on_submit(self, instance):
+        # Are fields empty?
+        if not self.student_name.text.strip() or not self.student_score.text or not self.student_gender.text:
+            message = "Please fill in all fields"
 
-        # Print newline
-        print()
+        # Is score an integer?
+        elif not self.student_score.text.isdigit():
+            message = "Score must be an integer"
+
+        # Is score in valid range(0-100)?
+        elif not int(self.student_score.text).strip() in range(0, 101):
+            message = "Score is not valid"
+
+        # Is gender valid?
+        elif not self.student_gender.text.lower() in ["male", "female"]:
+            message = "Gender not valid\nHint: Male or Female"
+
+        else:        
+            # Message to pop up
+            message = f"{self.student_name.text} is {self.student_gender.text} and scored {self.student_score.text}"
+
+        # Create popup window
+        popup = Popup(title="Prompt", content=Label(text=message), size_hint=(None, None), size=(400, 200))
+
+        # Open popup
+        popup.open()
 
 # Base class
 class StudentApp(App):
